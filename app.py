@@ -2,15 +2,15 @@ import streamlit as st
 from openai import OpenAI, Stream
 import json
 import elasticsearch
+from src.db.laptop_db import LaptopDatabase
 
-es_host = "http://localhost:9200"
-es = elasticsearch.Elasticsearch([es_host])
+database = LaptopDatabase()
 
 # Set OpenAI API key from Streamlit secrets
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 if "openai_model" not in st.session_state:
-    st.session_state["openai_model"] = "gpt-3.5-turbo"
+    st.session_state["openai_model"] = "gpt-4"
 
 
 def get_messages() -> list:
@@ -21,33 +21,19 @@ def get_messages() -> list:
         "role": "system",
         "content": "You are Lisa, a friendly assistant. Help the user find a laptop that suits their needs. Please adapt to the user's language level and expertise. Ask as many questions as needed to reduce the possible laptops to an optimal choice.",
     }
+    few_shot_prompts = [
+        {"role": "user", "content": "I am a gamer"},
+        {
+            "role": "assistant",
+            "content": "I understand you are a gamer, do you need a powerful graphics card?",
+        },
+    ]
     result = [
         {"role": m["role"], "content": m["content"]} for m in st.session_state.messages
     ]
+    result = [*few_shot_prompts, result]
     result.insert(0, system)
     return result
-
-
-def search_laptops(lucene_query: str) -> list:
-    """Search ElasticSearch index with a lucene query."""
-
-    # Define the search query
-    search_body = {
-        "query": {
-            "query_string": {
-                "query": lucene_query,
-                "default_field": "brand",  # Specify the default field to search
-            }
-        }
-    }
-
-    # Perform the search
-    result = es.search(index="laptops", body=search_body)
-
-    # Return the results
-    if result and "hits" in result and "hits" in result["hits"]:
-        return result["hits"]["hits"]
-    return []
 
 
 def show_title() -> None:
@@ -72,13 +58,14 @@ def init_message_history() -> None:
 def show_message_history() -> None:
     # Display chat messages from history on app rerun
     for message in st.session_state.messages:
-        avatar = message["avatar"] if "avatar" in message else False
-        if avatar:
-            with st.chat_message(message["role"], avatar=avatar):
-                st.markdown(message["content"])
-        else:
-            with st.chat_message(message["role"]):
-                st.markdown(message["content"])
+        if "role" in message:
+            avatar = message["avatar"] if "avatar" in message else False
+            if avatar:
+                with st.chat_message(message["role"], avatar=avatar):
+                    st.markdown(message["content"])
+            else:
+                with st.chat_message(message["role"]):
+                    st.markdown(message["content"])
 
 
 def show_user_message(prompt: str) -> None:
@@ -151,12 +138,67 @@ def handle_delta(delta, recovered_pieces) -> str | None:
     return delta.content or ""
 
 
-def add_function_call_to_history():
-    pass
+def add_function_call_to_history(id, function_name, function_response):
+    history = {
+        "tool_call_id": id,
+        "role": "tool",
+        "name": function_name,
+        "content": function_response,
+    }
+    st.session_state.messages.append(history)
 
 
 def handle_response(response, recovered_pieces):
     return handle_delta(response.choices[0].delta, recovered_pieces)
+
+
+def handle_no_results():
+    """handle the situation with no results."""
+    with st.chat_message("assistant", avatar="👩‍💻"):
+        message_placeholder = st.empty()
+        full_response = ""
+        for response in client.chat.completions.create(
+            model=st.session_state["openai_model"],
+            messages=get_messages(),
+            stream=True,
+        ):
+            if response.content:
+                full_response += response.content
+                write_response_markdown(message_placeholder, full_response)
+
+        st.session_state.messages.append(
+            {"role": "assistant", "content": full_response, "avatar": "👩‍💻"}
+        )
+
+
+def handle_results(results):
+    """handle the situation with results."""
+    with st.chat_message("assistant", avatar="👩‍💻"):
+        message_placeholder = st.empty()
+        full_response = ""
+        for response in client.chat.completions.create(
+            model=st.session_state["openai_model"],
+            messages=get_messages(),
+            stream=True,
+        ):
+            if response.content:
+                full_response += response.content
+                write_response_markdown(message_placeholder, full_response)
+
+        st.session_state.messages.append(
+            {"role": "assistant", "content": full_response, "avatar": "👩‍💻"}
+        )
+
+
+def laptop_to_md(laptop) -> str:
+    source = laptop["_source"]
+    title = source["title"]
+    image_url = (
+        source["imageURLs"][0]
+        if "imageURLs" in source
+        else "https://http.cat/status/100"
+    )
+    return f"{title}\n![image of {title}]({image_url})"
 
 
 def show_assistant_message() -> None:
@@ -174,25 +216,35 @@ def show_assistant_message() -> None:
         # finished first response.
         if len(recovered_pieces["tool_calls"]) > 0:
             # call search.
+            loading_message = (
+                "Hmm, I'm looking for your ideal laptop :laptop:, please wait..."
+            )
+            st.markdown(loading_message)
+            st.session_state.messages.append(
+                {"role": "assistant", "content": loading_message, "avatar": "👩‍💻"}
+            )
             argument = recovered_pieces["tool_calls"][0]["function"]["arguments"]
             json_it = json.loads(argument)
             query = json_it["lucene_query"]
-            print(query)
 
-            results = search_laptops(query)
-            amount_of_laptops = len(results)
+            add_function_call_to_history(
+                recovered_pieces["tool_calls"][0]["id"], "search_laptops", query
+            )
+
+            results = database.search_laptops(query)
             if results and len(results) > 0:
-                laptop_columns = message_placeholder.columns(amount_of_laptops)
                 for i, laptop in enumerate(results):
-                    print("laptops: ", laptop)
-                    laptop_columns[i].markdown(laptop["titleStandard"])
-                    laptop_columns[i].markdown(f"![image]({laptop['imageUrls'][0]})")
+                    laptop_md = laptop_to_md(laptop)
+                    st.markdown(laptop_md)
+                    st.session_state.messages.append(laptop_to_md)
+                handle_results(results)
             else:
                 full_response += "I found no results for these preferences."
                 message_placeholder.markdown(full_response)
                 st.session_state.messages.append(
                     {"role": "assistant", "content": full_response, "avatar": "👩‍💻"}
                 )
+                handle_no_results()
         else:
             message_placeholder.markdown(full_response)
             st.session_state.messages.append(
@@ -204,7 +256,14 @@ show_title()
 init_message_history()
 show_message_history()
 
-prompt = st.chat_input("What is up?")
+st.sidebar.markdown("**Laptop Assistant Configuration**")
+option = st.sidebar.selectbox(label="Chatbot", options=["Aligned", "Unaligned"])
+
+if "chatbot" not in st.session_state:
+    st.session_state["chatbot"] = option
+
+prompt = st.chat_input("What is your preference?")
+
 
 if prompt:
     # Display user message in chat message container
