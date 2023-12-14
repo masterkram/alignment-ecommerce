@@ -10,8 +10,8 @@ UI_ROLES = ["assistant", "user"]
 class ChatContext:
     def __init__(self, starting_history: list = init_message_history()):
         # Initialize chat history
-        # if "messages" not in st.session_state:
-        st.session_state.messages = starting_history
+        if "messages" not in st.session_state:
+            st.session_state.messages = starting_history
 
     def addMessage(self, message: Message):
         st.session_state.messages.append(message.toLLMDict())
