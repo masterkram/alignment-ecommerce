@@ -67,6 +67,10 @@ class Assistant:
 
         return False
 
+    def run_set_user(self, profile: str) -> None:
+        st.session_state.profile = profile
+        st.toast(f"User Has Been Classified As ${profile}")
+
     def recover_function_piece(self, delta, recovered_pieces: FunctionCall):
         piece = delta.tool_calls[0]
 
