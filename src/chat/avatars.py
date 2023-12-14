@@ -1,0 +1,1 @@
+avatars = {"assistant": "👩‍💻", "user": None}
