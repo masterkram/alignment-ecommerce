@@ -21,7 +21,7 @@ class Func:
 
 
 class FunctionCall:
-    id: Union(str, None)
+    id: Union[str, None]
     function: Func
     type: str
 
@@ -94,7 +94,7 @@ class Assistant:
             recovered_pieces.function.name = piece.function.name
         recovered_pieces.function.arguments += piece.function.arguments
 
-    def handle_delta(self, delta, recovered_pieces: FunctionCall) -> Union(str, None):
+    def handle_delta(self, delta, recovered_pieces: FunctionCall) -> Union[str, None]:
         if delta.content is None:
             if delta.tool_calls:
                 self.recover_function_piece(delta, recovered_pieces)
