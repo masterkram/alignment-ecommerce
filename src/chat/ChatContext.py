@@ -22,6 +22,15 @@ class ChatContext:
             {"role": "function", "name": "search_laptops", "content": result}
         )
 
+    def addProfile(self, profile: str):
+        st.session_state.messages.append(
+            {
+                "role": "function",
+                "name": "set_profile",
+                "content": f"set profile={profile}",
+            }
+        )
+
     # def addFunction(self, function: Function):
 
     def getContext(self):

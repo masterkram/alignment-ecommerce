@@ -53,6 +53,23 @@ class GPT4(LLM):
                             "required": ["lucene_query"],
                         },
                     },
-                }
+                },
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "set_profile",
+                        "description": "Set the profile of the user.",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "profile": {
+                                    "type": "string",
+                                    "description": "A string representing a profile out of: Gamer, Student, Programmer, Creative, Professional or Novice User.",
+                                },
+                            },
+                            "required": ["profile"],
+                        },
+                    },
+                },
             ],
         )
