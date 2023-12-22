@@ -1,11 +1,15 @@
 from humanloop import Humanloop
 import streamlit as st
 import openai
+from ..research.ExperimentManager import Experiment
 
 
 class LLM:
-    def __init__(self, model):
+    experiment: Experiment
+
+    def __init__(self, model, experiment: Experiment):
         self.model = model
+        self.experiment = experiment
 
     def chat():
         pass
@@ -20,11 +24,13 @@ class HumanLoop(LLM):
 
 
 class GPT4(LLM):
-    def __init__(self):
-        super().__init__(openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"]))
+    def __init__(self, experiment: Experiment):
+        super().__init__(
+            openai.OpenAI(api_key=st.secrets["OPENAI_API_KEY"]), experiment
+        )
 
     def chat(self, messages: list):
-        system = "You are Lisa, a friendly assistant. Help the user find a laptop that suits their needs. Please adapt to the user's language level and expertise. Prefer short questions not to overwhelm the user. Ask as many questions as needed to reduce the possible laptops to an optimal choice."
+        system = self.experiment.system_prompt
         messages = [{"role": "system", "content": system}, *messages]
         return self.model.chat.completions.create(
             model="gpt-4",
@@ -47,6 +53,23 @@ class GPT4(LLM):
                             "required": ["lucene_query"],
                         },
                     },
-                }
+                },
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "set_profile",
+                        "description": "Set the profile of the user.",
+                        "parameters": {
+                            "type": "object",
+                            "properties": {
+                                "profile": {
+                                    "type": "string",
+                                    "description": "A string representing a profile out of: Gamer, Student, Programmer, Creative, Professional or Novice User.",
+                                },
+                            },
+                            "required": ["profile"],
+                        },
+                    },
+                },
             ],
         )

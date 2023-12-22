@@ -8,14 +8,16 @@ from src.chat.llm import LLM, GPT4
 from src.research.ExperimentManager import ExperimentManager
 from src.ui.not_found import not_found
 from src.chat.Assistant import Assistant
-from src.ui.assistant_message import show_assistant_message
+import sys
+
+is_debug = sys.argv[0] == "debug"
 
 experiment_manager = ExperimentManager()
 experiment_manager.setCode(st.experimental_get_query_params())
 experiment = experiment_manager.getExperimentSetup()
 
 database = LaptopDatabase()
-model = GPT4()
+model = GPT4(experiment)
 chat_context = ChatContext()
 assistant = Assistant(model, chat_context, database)
 
@@ -26,6 +28,10 @@ show_title()
 chat_ui.show_history(chat_context.getUIContext())
 
 prompt = chat_ui.show_chat_input()
+
+
+if True and experiment.getName():
+    st.toast(f"Using {experiment.getName()} Model.")
 
 if prompt:
     # Display user message in chat message container

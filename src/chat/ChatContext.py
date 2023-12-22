@@ -10,8 +10,8 @@ UI_ROLES = ["assistant", "user"]
 class ChatContext:
     def __init__(self, starting_history: list = init_message_history()):
         # Initialize chat history
-        # if "messages" not in st.session_state:
-        st.session_state.messages = starting_history
+        if "messages" not in st.session_state:
+            st.session_state.messages = starting_history
 
     def addMessage(self, message: Message):
         st.session_state.messages.append(message.toLLMDict())
@@ -20,6 +20,15 @@ class ChatContext:
         result = ",".join([chat_ui.laptop_to_markdown(laptop) for laptop in laptops])
         st.session_state.messages.append(
             {"role": "function", "name": "search_laptops", "content": result}
+        )
+
+    def addProfile(self, profile: str):
+        st.session_state.messages.append(
+            {
+                "role": "function",
+                "name": "set_profile",
+                "content": f"set profile={profile}",
+            }
         )
 
     # def addFunction(self, function: Function):
