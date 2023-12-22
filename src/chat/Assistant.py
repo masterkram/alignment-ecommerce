@@ -7,6 +7,7 @@ import json
 from ..db.laptop_db import LaptopDatabase
 from ..ui import chat_ui as chat_ui
 from .Message import Message
+from ..research.Logging import Logger
 
 
 class Func:
