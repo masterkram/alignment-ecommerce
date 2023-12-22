@@ -1,7 +1,7 @@
 import streamlit as st
 
 
-def not_found():
+def not_found(reason: str):
     st.markdown("# Hey :wave:")
     st.markdown(
         "This is our test chat client for the Advanced NLP Project at the University of Twente."

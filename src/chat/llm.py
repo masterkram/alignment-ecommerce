@@ -35,6 +35,7 @@ class GPT4(LLM):
         return self.model.chat.completions.create(
             model="gpt-4",
             messages=messages,
+            seed=447,
             stream=True,
             tools=[
                 {

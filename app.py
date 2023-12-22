@@ -5,32 +5,47 @@ from src.chat.Message import Message
 from src.chat.ChatContext import ChatContext
 import src.ui.chat_ui as chat_ui
 from src.chat.llm import LLM, GPT4
-from src.research.ExperimentManager import ExperimentManager
+from src.research.ExperimentManager import (
+    ExperimentManager,
+    ExperimentManagerSetupException,
+)
 from src.ui.not_found import not_found
 from src.chat.Assistant import Assistant
-import sys
+import os
+from dotenv import load_dotenv
+from src.research.Logging import Logger
 
-is_debug = sys.argv[0] == "debug"
+from streamlit.runtime.scriptrunner import get_script_run_ctx
+import streamlit as st
+
+ctx = get_script_run_ctx()
+session_id = ctx.session_id
+
+load_dotenv(verbose=True)
+is_debug = os.getenv("DEBUG", False) == "True"
 
 experiment_manager = ExperimentManager()
-experiment_manager.setCode(st.experimental_get_query_params())
-experiment = experiment_manager.getExperimentSetup()
+try:
+    experiment_manager.setup(st.experimental_get_query_params())
+except ExperimentManagerSetupException as ex:
+    not_found(ex)
 
+experiment = experiment_manager.getExperimentSetup()
 database = LaptopDatabase()
 model = GPT4(experiment)
-chat_context = ChatContext()
+my_logger = Logger(
+    experiment_manager.user, experiment.name, experiment.code, session_id
+)
+chat_context = ChatContext(my_logger)
 assistant = Assistant(model, chat_context, database)
-
-if experiment == None:
-    not_found()
 
 show_title()
 chat_ui.show_history(chat_context.getUIContext())
 
 prompt = chat_ui.show_chat_input()
 
-
-if True and experiment.getName():
+experiment_name = experiment.getName()
+if is_debug and experiment_name:
     st.toast(f"Using {experiment.getName()} Model.")
 
 if prompt:
