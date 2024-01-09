@@ -41,4 +41,5 @@ class LaptopDatabase:
 
 
 if __name__ == "__main__":
+    print(st.secrets["ELASTIC_ID"])
     LaptopDatabase()
