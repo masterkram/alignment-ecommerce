@@ -27,8 +27,8 @@ class Experiment:
 
 
 EXPERIMENTS = {
-    "mvoqvr": Experiment("Aligned Chatbot :angel:", SYSTEM_ALIGNED, "mvoqvr"),
-    "hdttzt": Experiment("Unaligned Chatbot :fire:", SYSTEM_UNALIGNED, "hdttzt"),
+    "mvoqvr": Experiment("aligned", SYSTEM_ALIGNED, "mvoqvr"),
+    "hdttzt": Experiment("unaligned", SYSTEM_UNALIGNED, "hdttzt"),
 }
 
 

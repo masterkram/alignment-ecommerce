@@ -1,3 +1,6 @@
+import json
+
+
 class Laptop:
     brand: str
     model: str
@@ -108,6 +111,9 @@ class Laptop:
         self.titleStandard = titleStandard
         self.imageURLs = imageURLs
         self.productURL = productURL
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
 
 def laptopFromJson(json: dict) -> Laptop:

@@ -13,7 +13,7 @@ from src.research.ExperimentManager import (
 from src.research.link_to_survey import get_link_to_survey
 from src.ui.not_found import not_found
 from src.chat.Assistant import Assistant
-from src.research.Logging import Logger
+from src.research.Logging import Logger, LangFuseLogger
 
 from streamlit.runtime.scriptrunner import get_script_run_ctx
 import streamlit as st
@@ -40,9 +40,7 @@ except ExperimentManagerSetupException as ex:
 experiment = experiment_manager.getExperimentSetup()
 database = LaptopDatabase()
 model = GPT4(experiment)
-my_logger = Logger(
-    experiment_manager.user, experiment.name, experiment.code, session_id
-)
+my_logger = LangFuseLogger(experiment_manager.user, experiment.getName(), session_id)
 chat_context = ChatContext(my_logger)
 assistant = Assistant(model, chat_context, database)
 

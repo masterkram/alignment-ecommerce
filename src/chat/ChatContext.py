@@ -28,7 +28,7 @@ class ChatContext:
 
     def addLaptops(self, laptops: list[Laptop]):
         result = ",".join([chat_ui.laptop_to_markdown(laptop) for laptop in laptops])
-        self.log(result)
+        self.logger.log_laptops(laptops)
         st.session_state.messages.append(
             {"role": "function", "name": "search_laptops", "content": result}
         )
