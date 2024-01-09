@@ -1,6 +1,7 @@
 import streamlit as st
 from src.db.laptop_db import LaptopDatabase
 from src.ui.title import show_title
+from src.ui.redirect_button import redirect_button
 from src.chat.Message import Message
 from src.chat.ChatContext import ChatContext
 import src.ui.chat_ui as chat_ui
@@ -9,6 +10,7 @@ from src.research.ExperimentManager import (
     ExperimentManager,
     ExperimentManagerSetupException,
 )
+from src.research.link_to_survey import get_link_to_survey
 from src.ui.not_found import not_found
 from src.chat.Assistant import Assistant
 import os
@@ -60,3 +62,6 @@ if prompt:
     # Display assistant response in chat message container
     # show_assistant_message()
     assistant.run()
+
+if chat_context.isDone():
+    redirect_button(get_link_to_survey(experiment_manager.user))
