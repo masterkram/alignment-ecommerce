@@ -1,13 +1,14 @@
 import elasticsearch
 from .Laptop import *
 import streamlit as st
+import os
 
 
 class LaptopDatabase:
     def __init__(
         self,
         cloud_based=True,
-        cloud_id="Laptops:ZXVyb3BlLXdlc3Q0LmdjcC5lbGFzdGljLWNsb3VkLmNvbSRiNGMwYjBlMDVkMDc0NDJmYjQwNDhkZDljNTFiNTNhZiRjNTk2MmQ5ZDFkZWY0ODY0YThmMmM0M2NhOTRjYThmMg==",
+        cloud_id=st.secrets["ELASTIC_ID"],
         url="http://localhost:9200",
         api_key=st.secrets["ELASTIC_CLOUD_KEY"],
     ):
@@ -37,3 +38,7 @@ class LaptopDatabase:
             return [laptopFromJson(x) for x in result["hits"]["hits"]]
 
         return []
+
+
+if __name__ == "__main__":
+    LaptopDatabase()

@@ -1,8 +1,5 @@
 from humanloop import Humanloop
 import streamlit as st
-import os
-
-location = os.getenv("LOCATION", "Local")
 
 
 class Logger:

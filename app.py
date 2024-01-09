@@ -13,8 +13,6 @@ from src.research.ExperimentManager import (
 from src.research.link_to_survey import get_link_to_survey
 from src.ui.not_found import not_found
 from src.chat.Assistant import Assistant
-import os
-from dotenv import load_dotenv
 from src.research.Logging import Logger
 
 from streamlit.runtime.scriptrunner import get_script_run_ctx
@@ -23,8 +21,7 @@ import streamlit as st
 ctx = get_script_run_ctx()
 session_id = ctx.session_id
 
-load_dotenv(verbose=True, override=True)
-is_debug = os.getenv("DEBUG", False) == "True"
+is_debug = st.secrets["DEBUG"] == "True"
 
 if "openai_model" not in st.session_state:
     st.session_state["openai_model"] = "gpt-3.5-turbo"
@@ -63,5 +60,6 @@ if prompt:
     # show_assistant_message()
     assistant.run()
 
-if chat_context.isDone():
-    redirect_button(get_link_to_survey(experiment_manager.user))
+done: tuple[bool, str] = chat_context.isDone()
+if done[0]:
+    redirect_button(get_link_to_survey(experiment_manager.user), done[1])

@@ -34,8 +34,12 @@ class ChatContext:
         )
         self.recommended = True
 
-    def isDone(self) -> bool:
-        return self.recommended or len(st.session_state.messages) > 25
+    def isDone(self) -> tuple[bool, str]:
+        if self.recommended:
+            return (True, "recommended")
+        if len(st.session_state.messages) > 25:
+            return (True, "long")
+        return (False, "")
 
     def addProfile(self, profile: str):
         self.log(f"set profile={profile}")
