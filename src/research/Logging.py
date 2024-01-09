@@ -24,6 +24,6 @@ class Logger:
         self.humanloop.log(
             project_id=self.project_id,
             messages=messages,
-            config={"model": "gpt-4"},
+            config={"model": st.session_state.openai_model},
             output=output,
         )

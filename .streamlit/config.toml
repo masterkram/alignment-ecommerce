@@ -9,3 +9,6 @@
 base = "dark"
 primaryColor = "#0ea5e9"
 font = "monospace"
+
+[model]
+token = "gpt-3.5-turbo-1106"

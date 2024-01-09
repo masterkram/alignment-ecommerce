@@ -33,7 +33,7 @@ class GPT4(LLM):
         system = self.experiment.system_prompt
         messages = [{"role": "system", "content": system}, *messages]
         return self.model.chat.completions.create(
-            model="gpt-4",
+            model=st.session_state.openai_model,
             messages=messages,
             seed=447,
             stream=True,

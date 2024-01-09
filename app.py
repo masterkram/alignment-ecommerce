@@ -21,8 +21,11 @@ import streamlit as st
 ctx = get_script_run_ctx()
 session_id = ctx.session_id
 
-load_dotenv(verbose=True)
+load_dotenv(verbose=True, override=True)
 is_debug = os.getenv("DEBUG", False) == "True"
+
+if "openai_model" not in st.session_state:
+    st.session_state["openai_model"] = "gpt-3.5-turbo"
 
 experiment_manager = ExperimentManager()
 try:
