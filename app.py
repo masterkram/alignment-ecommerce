@@ -27,7 +27,7 @@ st.set_page_config(
     page_title="Laptop Recommender",
     page_icon="computer",
 )
-
+st.session_state["finished"] = False
 if "openai_model" not in st.session_state:
     st.session_state["openai_model"] = "gpt-4"
 

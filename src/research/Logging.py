@@ -24,6 +24,7 @@ class LangFuseLogger(Logger):
     langfuse: Langfuse
 
     def __init__(self, user: str, experiment: str, session_id: str):
+        # TODO: add user id.
         super().__init__(user, session_id)
         self.langfuse = Langfuse(
             public_key=st.secrets["LANGFUSE_PUBLIC_KEY"],

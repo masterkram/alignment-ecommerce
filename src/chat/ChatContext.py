@@ -17,6 +17,7 @@ class ChatContext:
             st.session_state.messages = starting_history
         self.logger = logger
         st.session_state.recommended = False
+        st.session_state.finished = False
 
     def log(self, output: str):
         self.logger.log_message(st.session_state.messages, output)
@@ -31,7 +32,6 @@ class ChatContext:
         st.session_state.messages.append(
             {"role": "function", "name": "search_laptops", "content": result}
         )
-        print("setting recommended.")
         st.session_state.recommended = True
         print(st.session_state.recommended)
 
