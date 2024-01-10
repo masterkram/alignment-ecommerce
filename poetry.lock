@@ -375,6 +375,20 @@ files = [
 ]
 
 [[package]]
+name = "colour"
+version = "0.1.5"
+description = "converts and manipulates various color representation (HSL, RVB, web, X11, ...)"
+optional = false
+python-versions = "*"
+files = [
+    {file = "colour-0.1.5-py2.py3-none-any.whl", hash = "sha256:33f6db9d564fadc16e59921a56999b79571160ce09916303d35346dddc17978c"},
+    {file = "colour-0.1.5.tar.gz", hash = "sha256:af20120fefd2afede8b001fbef2ea9da70ad7d49fafdb6489025dae8745c3aee"},
+]
+
+[package.extras]
+test = ["nose"]
+
+[[package]]
 name = "distro"
 version = "1.8.0"
 description = "Distro - an OS platform information API"
@@ -2065,4 +2079,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "573b798358f71701536d601c02a9b2218422539fbd26064371113c674d8adb39"
+content-hash = "f405932f85d2fe8057ffaf5d6fc78091f32aa2198afa74e0a2a76cd48f10bf85"
