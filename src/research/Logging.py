@@ -20,32 +20,50 @@ class Logger:
         pass
 
 
-class LangFuseLogger:
+class LangFuseLogger(Logger):
     langfuse: Langfuse
 
     def __init__(self, user: str, experiment: str, session_id: str):
-        super.__init__(user, session_id)
+        super().__init__(user, session_id)
         self.langfuse = Langfuse(
             public_key=st.secrets["LANGFUSE_PUBLIC_KEY"],
             secret_key=st.secrets["LANGFUSE_SECRET_KEY"],
         )
-        self.trace = self.langfuse.trace("laptop-recommendation", tags=[experiment])
+        self.trace = self.langfuse.trace(
+            name="laptop-recommendation",
+            tags=[experiment],
+            session_id=session_id,
+            metadata={"experiment": experiment},
+        )
 
     def log_message(self, messages: list, output: str):
-        generation = self.trace.generation(
-            session_id=self.session_id,
-            user_id=self.user,
-            name="chat",
-            model="gpt-3.5-turbo",
-            input=messages,
-        )
-        generation.end(output=output)
+        try:
+            generation = self.trace.generation(
+                session_id=self.session_id,
+                user_id=self.user,
+                name="chat",
+                model=st.session_state.openai_model,
+                input=messages,
+            )
+            generation.end(output=output)
+        except:
+            pass
 
     def log_laptops(self, laptops: list[Laptop], query: str):
-        json_laptops = json.dump([laptop.toJSON() for laptop in laptops])
-        event = self.trace.event(
-            name="laptop-retrieval", input=query, output=json_laptops
-        )
+        try:
+            json_laptops = json.dumps([laptop.toJSON() for laptop in laptops])
+            event = self.trace.event(
+                name="laptop-retrieval", input=query, output=json_laptops
+            )
+        except:
+            pass
+
+    def finish_log(self, success: bool) -> None:
+        try:
+            output = json.dumps({"success": success})
+            self.trace.event(name="redirect", input="", output=output)
+        except:
+            pass
 
     def flush(self):
         self.langfuse.flush()

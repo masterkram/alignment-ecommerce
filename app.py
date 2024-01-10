@@ -29,7 +29,7 @@ st.set_page_config(
 )
 
 if "openai_model" not in st.session_state:
-    st.session_state["openai_model"] = "gpt-3.5-turbo"
+    st.session_state["openai_model"] = "gpt-4"
 
 experiment_manager = ExperimentManager()
 try:
@@ -47,11 +47,11 @@ assistant = Assistant(model, chat_context, database)
 show_title()
 chat_ui.show_history(chat_context.getUIContext())
 
-prompt = chat_ui.show_chat_input()
-
 experiment_name = experiment.getName()
 if is_debug and experiment_name:
     st.toast(f"Using {experiment.getName()} Model.")
+
+prompt = chat_ui.show_chat_input()
 
 if prompt:
     # Display user message in chat message container
@@ -63,6 +63,6 @@ if prompt:
     # show_assistant_message()
     assistant.run()
 
-done: tuple[bool, str] = chat_context.isDone()
-if done[0]:
-    redirect_button(get_link_to_survey(experiment_manager.user), done[1])
+    done: tuple[bool, str] = chat_context.isDone()
+    if done[0]:
+        redirect_button(get_link_to_survey(experiment_manager.user), done[1])

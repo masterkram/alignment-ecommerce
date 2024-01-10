@@ -72,16 +72,17 @@ class Assistant:
         print(len(results))
 
         if results and len(results) > 0:
-            self.chat_context.addLaptops(results)
+            self.chat_context.addLaptops(results, query)
             for laptop in results:
                 chat_ui.show_laptop(laptop)
             return True
 
+        self.chat_context.addNoResults()
         return False
 
     def run_set_user(self, profile: str) -> bool:
         st.session_state.profile = profile
-        st.toast(f"User Has Been Classified As ${profile}")
+        st.toast(f"Your profile is {profile}")
         self.chat_context.addProfile(profile)
         return True
 
@@ -105,6 +106,10 @@ class Assistant:
     def handle_response(self, response, recovered_pieces: FunctionCall):
         return self.handle_delta(response.choices[0].delta, recovered_pieces)
 
+    def write_buffering(self, message, callback) -> None:
+        for i in range(3):
+            message.write(".")
+
     def _initial_message(self):
         print(avatars[self.role])
         with st.chat_message("assistant", avatar="👩‍💻"):
@@ -117,7 +122,8 @@ class Assistant:
                     chat_message.write(text)
             # done
             if chat_message.tmp_response == "":
-                chat_message.write("I see.")
+                chat_message.write("...")
+
             chat_message.flush()
             self.chat_context.addMessage(Message(self.role, chat_message.tmp_response))
 
