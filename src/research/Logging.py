@@ -43,7 +43,7 @@ class LangFuseLogger(Logger):
                 session_id=self.session_id,
                 user_id=self.user,
                 name="chat",
-                model=st.session_state.openai_model,
+                model="gpt-4",
                 input=messages,
             )
             generation.end(output=output)
@@ -89,7 +89,7 @@ class HumanLoopLogger:
         self.humanloop.log(
             project_id=self.project_id,
             messages=messages,
-            config={"model": st.session_state.openai_model},
+            config={"model": "gpt-4"},
             output=output,
         )
 

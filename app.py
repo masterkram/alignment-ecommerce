@@ -15,11 +15,11 @@ from src.ui.not_found import not_found
 from src.chat.Assistant import Assistant
 from src.research.Logging import Logger, LangFuseLogger
 
-from streamlit.runtime.scriptrunner import get_script_run_ctx
+# from streamlit.runtime.scriptrunner import get_script_run_ctx
 import streamlit as st
 
-ctx = get_script_run_ctx()
-session_id = ctx.session_id
+# ctx = get_script_run_ctx()
+session_id = 1
 
 is_debug = st.secrets["DEBUG"] == "True"
 
@@ -27,9 +27,9 @@ st.set_page_config(
     page_title="Laptop Recommender",
     page_icon="computer",
 )
-st.session_state["finished"] = False
-if "openai_model" not in st.session_state:
-    st.session_state["openai_model"] = "gpt-4"
+# st.session_state["finished"] = False
+# if "openai_model" not in st.session_state:
+# st.session_state["openai_model"] = "gpt-4"
 
 experiment_manager = ExperimentManager()
 try:

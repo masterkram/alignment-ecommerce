@@ -5,7 +5,7 @@ import time
 
 
 def show_chat_input() -> None:
-    return st.chat_input("What is your preference?", disabled=st.session_state.finished)
+    return st.chat_input("What is your preference?", disabled=False)
 
 
 def show_message(message: Message) -> None:

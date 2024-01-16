@@ -81,7 +81,7 @@ class Assistant:
         return False
 
     def run_set_user(self, profile: str) -> bool:
-        st.session_state.profile = profile
+        # st.session_state.profile = profile
         st.toast(f"Your profile is {profile}")
         self.chat_context.addProfile(profile)
         return True
