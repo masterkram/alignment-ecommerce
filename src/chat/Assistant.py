@@ -9,6 +9,12 @@ from ..ui import chat_ui as chat_ui
 from .Message import Message
 from ..research.Logging import Logger
 from typing import Union
+import re
+
+
+def correct_escapes(s: str) -> str:
+    s = re.sub(r"\\+", r"\\\\", s)
+    return s
 
 
 class Func:
@@ -139,7 +145,13 @@ class Assistant:
                     my_function = available_functions[function_call.function.name][
                         "function"
                     ]
-                    my_argument = json.loads(function_call.function.arguments)[
+                    arg = function_call.function.arguments
+                    try:
+                        arg = correct_escapes(arg)
+                    except:
+                        pass
+
+                    my_argument = json.loads(arg)[
                         available_functions[function_call.function.name]["args"]
                     ]
                     print(
