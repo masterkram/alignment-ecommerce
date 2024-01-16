@@ -10,17 +10,26 @@ UI_ROLES = ["assistant", "user"]
 
 class ChatContext:
     logger: Logger
+    recommended: bool
 
     def __init__(self, logger, starting_history: list = []):
         # Initialize chat history
         if "messages" not in st.session_state:
             st.session_state.messages = init_message_history()
         self.logger = logger
-        st.session_state.recommended = False
         st.session_state.finished = False
+        self.recommended = False
 
     def log(self, output: str):
         self.logger.log_message(st.session_state.messages, output)
+
+    def check_if_done(self) -> None:
+        if self.recommended:
+            st.session_state.finished = True
+            return
+        if len(st.session_state.messages) > 55:
+            st.session_state.finished = True
+            return
 
     def addMessage(self, message: Message):
         self.log(message.message)
@@ -32,16 +41,15 @@ class ChatContext:
         st.session_state.messages.append(
             {"role": "function", "name": "search_laptops", "content": result}
         )
-        st.session_state.recommended = True
-        print(st.session_state.recommended)
+        self.recommended = True
 
     def isDone(self) -> tuple[bool, str]:
-        if st.session_state.recommended:
-            st.session_state.finished = True
+        if self.recommended:
             return (True, "recommended")
         if len(st.session_state.messages) > 55:
-            st.session_state.finished = True
             return (True, "long")
+        if st.session_state.finished:
+            return (True, "recommended")
         return (False, "")
 
     def addProfile(self, profile: str):

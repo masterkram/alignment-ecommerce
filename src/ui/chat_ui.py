@@ -4,8 +4,10 @@ from ..db.Laptop import Laptop
 import time
 
 
-def show_chat_input() -> None:
-    return st.chat_input("What is your preference?", disabled=st.session_state.finished)
+def show_chat_input(disabled=False, message="") -> None:
+    key = 1 if disabled == False else 0
+    text = "What is your preference" if not disabled else message
+    return st.chat_input(text, disabled=disabled, key=key)
 
 
 def show_message(message: Message) -> None:

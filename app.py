@@ -27,7 +27,7 @@ st.set_page_config(
     page_title="Laptop Recommender",
     page_icon="computer",
 )
-st.session_state["finished"] = False
+
 if "openai_model" not in st.session_state:
     st.session_state["openai_model"] = "gpt-4"
 
@@ -53,6 +53,10 @@ if is_debug and experiment_name:
 
 prompt = chat_ui.show_chat_input()
 
+done: tuple[bool, str] = chat_context.isDone()
+if done[0]:
+    redirect_button(get_link_to_survey(experiment_manager.user), done[1])
+
 if prompt:
     # Display user message in chat message container
     user_message = Message("user", prompt)
@@ -63,6 +67,8 @@ if prompt:
     # show_assistant_message()
     assistant.run()
 
+    chat_context.check_if_done()
     done: tuple[bool, str] = chat_context.isDone()
     if done[0]:
         redirect_button(get_link_to_survey(experiment_manager.user), done[1])
+        chat_ui.show_chat_input(True, "You are done with the tool.")
