@@ -11,10 +11,10 @@ UI_ROLES = ["assistant", "user"]
 class ChatContext:
     logger: Logger
 
-    def __init__(self, logger, starting_history: list = init_message_history()):
+    def __init__(self, logger, starting_history: list = []):
         # Initialize chat history
         if "messages" not in st.session_state:
-            st.session_state.messages = starting_history
+            st.session_state.messages = init_message_history()
         self.logger = logger
         st.session_state.recommended = False
         st.session_state.finished = False
